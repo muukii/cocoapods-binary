@@ -1,3 +1,9 @@
+fork for https://github.com/muukii/cocoapods-binary
+
+add `forbidden_dependency_binary!`, Prevent the automatic compilation of dependent libraries into binary as well.
+
+---
+
 > ⚠️ This is a temporaly forked repository.  
 
 https://github.com/leavez/cocoapods-binary/pull/137
