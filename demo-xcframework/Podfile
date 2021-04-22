@@ -1,0 +1,20 @@
+platform :ios, "12.0"
+plugin "cocoapods-binary"
+
+use_frameworks!
+enable_bitcode_for_prebuilt_frameworks!
+use_xcframework!
+
+target "demo" do
+  pod "Alamofire", binary: true
+end
+
+target "ModuleA" do
+  platform :ios, "12.0"
+  pod "Verge", binary: true
+end
+
+target "ModuleB" do
+  platform :ios, "12.0"
+  pod "Reusable", binary: true
+end

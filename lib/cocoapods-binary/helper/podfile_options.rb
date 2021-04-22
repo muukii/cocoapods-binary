@@ -33,7 +33,7 @@ module Pod
                 @should_not_prebuild_framework_pod_names.push pod_name
             end
         end
-
+        
         def prebuild_framework_pod_names
             names = @prebuild_framework_pod_names || []
             if parent != nil and parent.kind_of? TargetDefinition
@@ -41,6 +41,7 @@ module Pod
             end
             names
         end
+        
         def should_not_prebuild_framework_pod_names
             names = @should_not_prebuild_framework_pod_names || []
             if parent != nil and parent.kind_of? TargetDefinition

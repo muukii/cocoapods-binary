@@ -71,6 +71,8 @@ module Pod
             sandbox_path = sandbox.root
             existed_framework_folder = sandbox.generate_framework_path
             bitcode_enabled = Pod::Podfile::DSL.bitcode_enabled
+            use_xcframework = Pod::Podfile::DSL.use_xcframework
+
             targets = []
             
             if local_manifest != nil
@@ -115,8 +117,7 @@ module Pod
             end
 
             targets = targets.reject {|pod_target| sandbox.local?(pod_target.pod_name) }
-
-            
+ 
             # build!
             Pod::UI.puts "Prebuild frameworks (total #{targets.count})"
             Pod::Prebuild.remove_build_dir(sandbox_path)
@@ -128,7 +129,26 @@ module Pod
 
                 output_path = sandbox.framework_folder_path_for_target_name(target.name)
                 output_path.mkpath unless output_path.exist?
-                Pod::Prebuild.build(sandbox_path, target, output_path, bitcode_enabled,  Podfile::DSL.custom_build_options,  Podfile::DSL.custom_build_options_simulator)
+
+                if use_xcframework
+                Pod::Prebuild.build_xcframework(
+                    sandbox_path,
+                    target, 
+                    output_path, 
+                    bitcode_enabled,  
+                    Podfile::DSL.custom_build_options,  
+                    Podfile::DSL.custom_build_options_simulator
+                )
+                else
+                Pod::Prebuild.build(
+                    sandbox_path, 
+                    target, 
+                    output_path, 
+                    bitcode_enabled,  
+                    Podfile::DSL.custom_build_options,  
+                    Podfile::DSL.custom_build_options_simulator
+                )
+                end
 
                 # save the resource paths for later installing
                 if target.static_framework? and !target.resource_paths.empty?
@@ -148,13 +168,13 @@ module Pod
                     raise "Wrong type: #{resources}" unless resources.kind_of? Array
 
                     path_objects = resources.map do |path|
-                        object = Prebuild::Passer::ResourcePath.new
+                        object = Pod::Prebuild::Passer::ResourcePath.new
                         object.real_file_path = framework_path + File.basename(path)
                         object.target_file_path = path.gsub('${PODS_ROOT}', standard_sandbox_path.to_s) if path.start_with? '${PODS_ROOT}'
                         object.target_file_path = path.gsub("${PODS_CONFIGURATION_BUILD_DIR}", standard_sandbox_path.to_s) if path.start_with? "${PODS_CONFIGURATION_BUILD_DIR}"
                         object
                     end
-                    Prebuild::Passer.resources_to_copy_for_static_framework[target.name] = path_objects
+                    Pod::Prebuild::Passer.resources_to_copy_for_static_framework[target.name] = path_objects
                 end
 
             end            

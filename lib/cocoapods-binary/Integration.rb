@@ -191,10 +191,15 @@ module Pod
                 # get_corresponding_targets
                 targets = Pod.fast_get_targets_for_pod_name(spec.root.name, self.pod_targets, cache)
                 targets.each do |target|
-                    # the framework_file_path rule is decided when `install_for_prebuild`,
-                    # as to compitable with older version and be less wordy.
-                    framework_file_path = target.framework_name
-                    framework_file_path = target.name + "/" + framework_file_path if targets.count > 1
+               
+                    if Pod::Podfile::DSL.use_xcframework
+                        framework_file_path = "#{target.name}.xcframework"
+                    else
+                        # the framework_file_path rule is decided when `install_for_prebuild`,
+                        # as to compitable with older version and be less wordy.
+                        framework_file_path = target.framework_name
+                        framework_file_path = target.name + "/" + framework_file_path if targets.count > 1
+                    end
                     add_vendered_framework(spec, target.platform.name.to_s, framework_file_path)
                 end
                 # Clean the source files
